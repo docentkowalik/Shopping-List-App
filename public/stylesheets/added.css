@@ -196,6 +196,37 @@ box-shadow:none;
 -webkit-box-shadow:none;
 }
 
+
+.itemBtn2{  color:white;
+  background-color:#29c9fe;
+  font-size:20px;
+  padding: 2px;
+  width: 60px;
+  font-family: agency;
+
+
+text-align: center;
+border: .2em solid #fff;  
+
+border-radius:5px;
+-moz-border-radius:5px;
+-webkit-border-radius:5px;
+box-shadow: 0px 3px 5px #000;
+-moz-box-shadow: 0px 3px 5px #000;
+-webkit-box-shadow: 0px 3px 5px #000;
+margin-bottom: 10px;
+margin-top: 10px;
+
+}
+.itemBtn2:hover{
+position:relative;
+top:3px;
+color: #FFF;
+box-shadow:none;
+-moz-box-shadow:none;
+-webkit-box-shadow:none;
+}
+
 .wrappAddItem{
     max-width: 430px;
     margin-left: 10px;
@@ -207,4 +238,19 @@ box-shadow:none;
 #middleText{
   color: #999;
 
+}
+
+input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin-left: 20px;
+}
+
+
+.textPick{
+  margin-right: 20px;
+    color: #FFFFFF;
+    text-decoration: none;
+      font-size: 1.5em;  
+        font-family: agency;
 }

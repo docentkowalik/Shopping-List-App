@@ -32,7 +32,7 @@ exports.dash = function(req, res) {
     // Getting the collection called 'lists' from the database
     if (err) {throw err;}
 
-    listsColl.find({listUser: ownerName}).sort('_id','desc').limit(10).toArray(function(err, listsArr) {
+    listsColl.find({listUser: ownerName}).sort('_id','desc').limit(0).toArray(function(err, listsArr) {
       //finding all lists where the listUser == ownerName
       //the list user is set in the javascript object that you can see inside the addList function
       //and it's value is the name of the owner stored up on the session
@@ -52,8 +52,18 @@ exports.addList = function(req, res) {
   var ownerOfTheList = req.session.username;;
   console.log("owner of the list :" + ownerOfTheList);
 
-  if (newList)  //if there is a value in newList variable
+  if (!newList)  //if there is no value in newList variable
   {
+    res.redirect('/dash');
+  }
+  else {
+    if(req.param('submit') == 'copy'){
+      pickAndCopy(req, res);
+      req.session.copyListName = newList;
+
+    }
+    else {
+  
     db.collection('lists', function(err, listCollection) {
       //get the lists collection
     
@@ -69,7 +79,7 @@ exports.addList = function(req, res) {
         res.redirect('/dash');
       });
     });
-  }
+  }}
 };
 
 exports.listOfItems = function(req, res) {
@@ -87,7 +97,7 @@ exports.listOfItems = function(req, res) {
     req.session.listOID = ListID;
 
     db.collection('items', function (err, itemsCollection) {
-      itemsCollection.find({listOwner: listObjectID}).limit(50).toArray(function (err, iremsArr){
+      itemsCollection.find({listOwner: listObjectID}).sort('_id','desc').limit(50).toArray(function (err, iremsArr){
         if (err) throw err;
 
         //in this part bellow I am doing checks for the statusChange function below.
@@ -130,17 +140,27 @@ exports.deleteList = function (req, res) {
   else {
     var listObjectID = new ObjectId(listId);
 
+//this code below is getting all the lists collection and removing the list which id is equal to the list ObjectID
+
     db.collection('lists', function (err, ListCollection){
       ListCollection.remove({_id: listObjectID}, {w:1}, function (err, result) {
         if (err) throw err;
         console.log("List Removed: ", result);
 
-        res.redirect('/dash');
+//when the list is removed also all the items that belonged to this list are being removed form the items collections
+//list owner is the property in the items collection inside the item object which is equal to the list objectID so when the list is being removed
+//then all the items wwhere the listOwner == listObjectId are removed as well
+            db.collection('items', function (err, itemCollection){
+              itemCollection.remove({listOwner: listObjectID}, {w:1}, function (err, result) {
+                if (err) throw err;
+                  console.log("items Removed: ", result);
+      res.redirect('/dash');
       });
     });
+    });
+  });
   }
 }
-
 
 exports.addItem = function(req, res) {
   var db = req.app.settings.db;
@@ -332,5 +352,59 @@ exports.logoutUser = function (req, res) {
   }                                     //then authorisation middleware will prevent the users form going to the restricted pages again
     console.log("User Logged Out");
     res.render('login');
+};
+
+var pickAndCopy = function (req, res) {
+  var db = req.app.settings.db;
+
+  // Get the value of the person form input field and store it on the session, we'll need it
+  // later
+  var newListName = req.param('newListName');
+  req.session.newListName = newListName;
+  var ownerName = req.session.username;   //accessing the username session which was created in the login function
+
+
+  db.collection('lists', function (err, listsCollection) {
+    if (err) throw err;
+
+    listsCollection.find({listUser: ownerName}).limit(50).toArray(function(err, resultsArray){
+      if (err) {throw err};
+
+      res.render('pickAndCopy', { listsArray: resultsArray });
+    })
+  });
+};
+
+exports.copyList = function (req, res) {
+  var db = req.app.settings.db;
+  var listToCopyID = req.param('newListName');
+  var listToCopyObjectID = new ObjectId(listToCopyID);
+  var copiedListName =  req.session.copyListName;
+  var ownerOfTheList = req.session.username;
+
+    db.collection('lists', function (err, listCollection) {
+    listCollection.insert({listName: copiedListName,  listUser:ownerOfTheList  }, {w:1}, function (err, insertedDocs) {
+      if (err) throw err;
+
+      var newListOID = insertedDocs[0]._id;
+
+      db.collection('items', function (err, itemsCollection) {
+        if (err) throw err;
+
+        itemsCollection.find({listOwner: listToCopyObjectID}).limit(50).toArray(function(err, resultsArray){
+          for (var i=0; i < resultsArray.length; i++) {
+            resultsArray[i].listOwner = newListOID;
+            delete resultsArray[i]._id;
+          }
+
+          itemsCollection.insert(resultsArray, {w:1}, function (err, result) {
+            if (err) throw err;
+
+            res.redirect('/listOfItems?id='+newListOID)
+          });
+        });
+      });
+    });
+  });
 };
 

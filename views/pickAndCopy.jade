@@ -27,29 +27,18 @@ html
     div.navbar-inner
      div.nav-center
       div(class='nav-center', id='middleText')
-       h4 Welcome #{username}
+       h4 Copy From: 
 
-  center
-   div.container
-    div.wrappAddItem
-     form(action='/addList', method='POST')
-      input(type="text", name="listName", class="inputItem", value='#{theDate}' maxlength="20")
-      input(type="submit", value="Create List" class="itemBtn")
-      button(type='submit', name='submit', value='copy', class="itemBtn") Copy 
+
 
   div.container
    center
-    for list in lists
-     ol.rounded
-      li
-       a(href="/listOfItems?id=#{list._id}&ownerID=#{owner}") #{list.listName}
-        span.options
-        a(href='/deleteList?listDel=#{list._id}')
-         img(src="/images/delete.png", id="logoImage")
+    form(action='/copyList', method='POST')
+     for list in listsArray
+      ul.rounded 
+       li
+        input(type='radio', name='newListName', value='#{list._id}') 
+        label(class='textPick') #{list.listName}      
+        input(type='submit', name='submit', value='Copy', class="itemBtn2")
 
- 
- 
-
-
-    
 
