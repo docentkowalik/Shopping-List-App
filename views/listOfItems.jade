@@ -1,0 +1,62 @@
+doctype html
+html
+ head
+  meta(charset='utf-8')
+  meta(name='viewport', content='width=device-width, initial-scale=1.0')
+  meta(name='description', content='')
+  meta(name='author', content='')
+  meta(name='copyright', content='Copyright (c) 2014 Mateusz Kowalik')
+        
+  link(rel='shortcut icon', href='/images/icon.png')
+  title Items
+  
+  link(rel='stylesheet', href='/stylesheets/bootstrap.css')
+  link(rel='stylesheet', href='/stylesheets/added.css')
+  script(src='http://code.jquery.com/jquery-1.11.0.min.js')
+
+ body(onload='document.newItemForm.item.focus();')
+  nav.navbar.navbar-inverse 
+   div.container
+    div.navbar-header
+     a.navbar-brand(href='dash') Go Shopping +
+    div
+     ul.nav.navbar-nav.navbar-right
+      li 
+       a(href="/logoutUser", class='glyphicon glyphicon-log-out navbar-brand') Logout
+       a(href="/dash", class='glyphicon glyphicon-dashboard navbar-brand') Dashboard
+
+    div.navbar-inner
+     div.nav-center
+      div(class='nav-center', id='middleText')
+       h4 Items To Buy    
+ 
+  center
+   div.container
+    div.wrappAddItem
+     form(name='newItemForm', action='/addItem' method='POST')
+      input(type="text", name="itemName", class="inputItem", maxlength="20", placeholder="NEW ITEM")
+      input(type="submit", value="Add Item" class="itemBtn")  
+
+
+  div.container
+   center
+    for item in items
+     ul.rounded 
+      li
+       span(class="itemText#{stat}")
+        a(href='#') #{item.itemName}
+        span.options
+         a(href='/deleteItem?id=#{item._id}')
+          img(src="/images/delete.png", id="logoImage")
+         a(href='/statusChange?upid=#{item._id}')
+          img(src="/images/no.png", class="img#{stat}")
+
+      
+         
+
+
+
+
+
+
+

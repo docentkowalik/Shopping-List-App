@@ -1,0 +1,80 @@
+
+
+db.lists.insert( { listName: 'Super Value', 
+        items: [
+                {
+                 itemName: 'Cornflakes',
+                 status: 0
+               },
+                {
+                  itemName: 'Water',
+                  status: 0,
+                },
+                {
+                 itemName: 'Eggs',
+                 status: 0,
+               }
+             ]
+          })
+
+
+
+db.items.update( { "_id" : ObjectId("5334849824d043ac001d86a0") }, { $set: { status: 1 }})
+
+
+db.lists.insert({ listName: 'Lidl' })
+
+db.items.insert({ itemName: 'Bread', status: 0, parentListId: '53306ab27a41a3505fb5292e' })
+
+
+exports.list = function(req, res) {
+  var db = req.app.settings.db;
+  var listID = req.query._id;
+  console.log("currentListIdinList:" + listID);
+  var listItemID = new ObjectId(listID);
+  stringID = listItemID.toHexString();
+
+  db.collection('items', function (err, itemsColl) {
+    if (err) {throw err;}
+
+    itemsColl.find( {listOwner: stringID}).sort('_id','desc').limit(10).toArray(function(err, itemsArr) {
+     console.log(itemsArr);
+      //for (var i=0; i<itemsArr.length; i++) {
+      //console.log("Item" + itemsArr[i]._id + " : " + itemsArr[i].itemName);
+   // }
+
+      res.render('list', {items: itemsArr, currentListVar: listID, curr_id: listID} );
+         // console.log("Session: " + req.session.ID);
+      });
+  });
+};
+
+
+exports.addItem = function(req, res) {
+  var db = req.app.settings.db;
+  var newItemName = req.param('itemName');
+     
+     var newListID = req.param('current_id');
+        console.log("buuuum" +newListID);
+
+if (newItemName)
+  {
+    db.collection('items', function(err, itemsCollection) {
+    
+      var itemNew = {
+        itemName: newItemName,
+        status: 0,
+        listOwner: newListID
+      };
+
+
+      itemsCollection.insert(itemNew , {w:1}, function (err, result) {
+        if (err) throw err;
+
+         console.log("Result of insert: ", result);
+        res.redirect('/dash');
+      });
+
+    });
+  }
+};

@@ -1,0 +1,41 @@
+doctype html
+html
+ head
+  meta(charset='utf-8')
+  meta(name='viewport', content='width=device-width, initial-scale=1.0')
+  meta(name='description', content='')
+  meta(name='author', content='')
+  meta(name='copyright', content='Copyright (c) 2014 Mateusz Kowalik')
+        
+  link(rel='shortcut icon', href='/images/icon.png')
+  title Register
+  
+  link(rel='stylesheet', href='/stylesheets/bootstrap.css')
+  link(rel='stylesheet', href='/stylesheets/addedLogin.css')
+ 
+ body
+  div.navbar.navbar-inverse
+   div.container
+    div.navbar-header
+     a.navbar-brand(href='/dash') Go Shopping +
+     
+    div 
+     ul.nav.navbar-nav.navbar-right
+      li 
+       a(href="/login", class='glyphicon glyphicon-log-in navbar-brand') Login
+
+  div.container
+   div.row
+    div.col-md-4
+    div.col-md-4
+     div.formStyle
+      form(action='/processRegister', method='POST').form-signin
+       h2.form-signin-heading
+        center
+         Please Register
+       input.form-control(type='text', placeholder='USERNAME', autofocus='autofocus', name='username')
+       br
+       input.form-control(type='password', placeholder='PASSWORD', name='password')
+       br
+       button.btn.btn-lg.btn-primary.btn-block(type='submit', name='submit') Register
+    
